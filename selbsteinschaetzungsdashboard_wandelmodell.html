@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Selbsteinschätzungsdashboard Schulentwicklung – Wandelmodell</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #18212b;
+      --muted: #5b6773;
+      --line: #dbe3ea;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+      --radius: 22px;
+      --radius-sm: 14px;
+      --space-1: 0.5rem;
+      --space-2: 0.75rem;
+      --space-3: 1rem;
+      --space-4: 1.25rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 2.5rem;
+      --space-8: 3rem;
+      --max-width: 1440px;
+
+      --adapt-bg: #dce8ee;
+      --adapt-accent: #284a5c;
+      --adapt-strong: #123449;
+      --adapt-soft: #edf3f6;
+
+      --develop-bg: #e8dfd8;
+      --develop-accent: #6f5444;
+      --develop-strong: #50392d;
+      --develop-soft: #f6f0eb;
+
+      --success: #177245;
+      --warn: #9c6b00;
+      --danger: #9b2c2c;
+      --focus: #274c77;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      color-scheme: light;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(40, 74, 92, 0.08), transparent 26%),
+        radial-gradient(circle at top right, rgba(111, 84, 68, 0.08), transparent 22%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    a { color: inherit; }
+
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+    }
+
+    .skip-link:focus {
+      left: 1rem;
+      top: 1rem;
+      background: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      z-index: 1000;
+      outline: 3px solid var(--focus);
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(18px);
+      background: rgba(244, 246, 248, 0.86);
+      border-bottom: 1px solid rgba(219, 227, 234, 0.8);
+    }
+
+    .header-inner,
+    .page,
+    .footer-inner {
+      width: min(calc(100% - 2rem), var(--max-width));
+      margin: 0 auto;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 0;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 0;
+    }
+
+    .eyebrow {
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    h1, h2, h3, h4, p { margin: 0; }
+
+    h1 {
+      font-size: clamp(1.25rem, 2vw, 1.8rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+
+    .page {
+      display: grid;
+      gap: var(--space-6);
+      padding: var(--space-6) 0 var(--space-8);
+    }
+
+    .hero {
+      display: grid;
+      gap: var(--space-5);
+      grid-template-columns: 1.3fr 0.9fr;
+      align-items: stretch;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(219, 227, 234, 0.85);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: clamp(1rem, 2vw, 1.6rem);
+    }
+
+    .card.soft {
+      background: rgba(255,255,255,0.74);
+    }
+
+    .hero-text {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .lede {
+      font-size: clamp(1.02rem, 1.5vw, 1.15rem);
+      color: var(--muted);
+      max-width: 70ch;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 0.95rem;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .pill.adapt {
+      background: var(--adapt-soft);
+      color: var(--adapt-strong);
+      border-color: rgba(40, 74, 92, 0.14);
+    }
+
+    .pill.develop {
+      background: var(--develop-soft);
+      color: var(--develop-strong);
+      border-color: rgba(111, 84, 68, 0.14);
+    }
+
+    .intro-grid,
+    .summary-grid,
+    .dimension-grid,
+    .bottom-grid {
+      display: grid;
+      gap: var(--space-5);
+    }
+
+    .intro-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .area-card {
+      display: grid;
+      gap: 1rem;
+      min-height: 100%;
+    }
+
+    .area-card.adapt {
+      background: linear-gradient(180deg, rgba(220, 232, 238, 0.9), rgba(255, 255, 255, 0.96));
+    }
+
+    .area-card.develop {
+      background: linear-gradient(180deg, rgba(232, 223, 216, 0.9), rgba(255, 255, 255, 0.96));
+    }
+
+    .area-card h2 {
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .area-card ul {
+      margin: 0;
+      padding-left: 1.15rem;
+      color: var(--muted);
+      display: grid;
+      gap: 0.7rem;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .mode-switch {
+      display: inline-flex;
+      padding: 0.3rem;
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      gap: 0.25rem;
+      width: fit-content;
+    }
+
+    .mode-switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mode-switch label {
+      cursor: pointer;
+      padding: 0.7rem 1rem;
+      border-radius: 999px;
+      font-weight: 700;
+      color: var(--muted);
+      transition: 180ms ease;
+      user-select: none;
+    }
+
+    .mode-switch input:focus-visible + label {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .mode-switch input:checked + label {
+      background: var(--text);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+    }
+
+    .btn,
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 14px;
+      padding: 0.9rem 1.1rem;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .btn:hover,
+    button:hover { transform: translateY(-1px); }
+    .btn:focus-visible,
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .btn.primary {
+      background: var(--text);
+      color: #fff;
+      box-shadow: 0 12px 20px rgba(24, 33, 43, 0.18);
+    }
+
+    .btn.secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .summary-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .kpi {
+      display: grid;
+      gap: 0.5rem;
+      align-content: start;
+      min-height: 100%;
+    }
+
+    .kpi .label {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .kpi .value {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .kpi .sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .kpi.adapt { border-top: 5px solid var(--adapt-accent); }
+    .kpi.develop { border-top: 5px solid var(--develop-accent); }
+    .kpi.total { border-top: 5px solid var(--text); }
+    .kpi.status { border-top: 5px solid var(--success); }
+
+    .viz-wrap {
+      display: grid;
+      grid-template-columns: minmax(280px, 1.05fr) minmax(280px, 1fr);
+      gap: var(--space-5);
+      align-items: start;
+    }
+
+    .chart-panel {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .chart-box {
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.9), rgba(255,255,255,1));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      min-height: 360px;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .bar-list {
+      display: grid;
+      gap: 0.95rem;
+    }
+
+    .bar-item {
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .bar-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .bar-track {
+      height: 0.9rem;
+      background: #edf1f5;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      transition: width 300ms ease;
+      background: linear-gradient(90deg, var(--adapt-accent), var(--develop-accent));
+    }
+
+    .dimension-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dimension-card {
+      display: grid;
+      gap: 1rem;
+      min-height: 100%;
+    }
+
+    .dimension-card.adapt {
+      background: linear-gradient(180deg, rgba(237, 243, 246, 0.9), rgba(255,255,255,1));
+      border-top: 6px solid var(--adapt-accent);
+    }
+
+    .dimension-card.develop {
+      background: linear-gradient(180deg, rgba(246, 240, 235, 0.9), rgba(255,255,255,1));
+      border-top: 6px solid var(--develop-accent);
+    }
+
+    .dimension-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .dimension-head h3 {
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
+    }
+
+    .badge {
+      flex: 0 0 auto;
+      min-width: 4.4rem;
+      text-align: center;
+      padding: 0.65rem 0.85rem;
+      border-radius: 14px;
+      font-weight: 800;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid var(--line);
+    }
+
+    .desc {
+      color: var(--muted);
+      font-size: 0.97rem;
+    }
+
+    .statement-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .statement {
+      background: rgba(255,255,255,0.85);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1rem;
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .statement legend {
+      font-weight: 650;
+      margin-bottom: 0.5rem;
+      padding: 0;
+    }
+
+    .rating-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+
+    .rating-option {
+      position: relative;
+    }
+
+    .rating-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .rating-option label {
+      display: grid;
+      gap: 0.2rem;
+      align-items: center;
+      justify-items: center;
+      min-height: 4rem;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      text-align: center;
+      padding: 0.6rem;
+      cursor: pointer;
+      transition: 180ms ease;
+    }
+
+    .rating-option label span:first-child {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .rating-option label span:last-child {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .rating-option input:checked + label {
+      border-color: transparent;
+      background: var(--text);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(24, 33, 43, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .rating-option input:checked + label span:last-child {
+      color: rgba(255,255,255,0.82);
+    }
+
+    .group-note {
+      display: none;
+      gap: 0.5rem;
+      padding: 0.95rem 1rem;
+      background: #fff;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+    }
+
+    .group-note.active {
+      display: grid;
+    }
+
+    .group-note label {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .group-note textarea {
+      resize: vertical;
+      min-height: 84px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      padding: 0.85rem 0.95rem;
+      font: inherit;
+      color: var(--text);
+      background: #fff;
+    }
+
+    .bottom-grid {
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: start;
+    }
+
+    .interpretation {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 0.55rem 0.85rem;
+      font-weight: 800;
+      background: rgba(23, 114, 69, 0.12);
+      color: var(--success);
+    }
+
+    .interpretation p,
+    .reflection li,
+    .small-text {
+      color: var(--muted);
+    }
+
+    .reflection ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .footer-inner {
+      padding: 0 0 2rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1100px) {
+      .hero,
+      .viz-wrap,
+      .bottom-grid,
+      .intro-grid,
+      .dimension-grid,
+      .summary-grid,
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar { align-items: stretch; }
+      .header-inner { align-items: start; }
+      .header-actions { justify-content: stretch; }
+    }
+
+    @media (max-width: 760px) {
+      .header-inner,
+      .page,
+      .footer-inner {
+        width: min(calc(100% - 1rem), var(--max-width));
+      }
+
+      .header-inner {
+        padding: 0.85rem 0;
+      }
+
+      .rating-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .dimension-head {
+        flex-direction: column;
+      }
+
+      .badge { min-width: 0; width: fit-content; }
+
+      .header-actions {
+        width: 100%;
+      }
+
+      .header-actions .btn {
+        flex: 1 1 auto;
+      }
+    }
+
+    @media print {
+      :root {
+        --bg: #ffffff;
+        --shadow: none;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .app-header {
+        position: static;
+        background: #fff;
+        border-bottom: 1px solid #cfd7df;
+      }
+
+      .header-actions,
+      .toolbar .small-text,
+      .group-note,
+      .mode-switch {
+        display: none !important;
+      }
+
+      .card,
+      .statement,
+      .chart-box {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+
+      .page {
+        gap: 1rem;
+      }
+
+      .dimension-grid,
+      .summary-grid,
+      .intro-grid,
+      .viz-wrap,
+      .bottom-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+  <header class="app-header" aria-label="Seitenkopf">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="eyebrow">ESG-Kontext · Schulleitung, Steuergruppe und Pädagogischer Tag</span>
+        <h1>Selbsteinschätzungsdashboard Schulentwicklung – Wandelmodell</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn secondary" type="button" id="printBtn">Als PDF drucken</button>
+        <button class="btn secondary" type="button" id="resetBtn">Eingaben zurücksetzen</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+    <section class="hero">
+      <article class="card hero-text">
+        <span class="eyebrow">Einschätzung für Schulleitung, Steuergruppe und Kollegium</span>
+        <h2>Wie entwickelt sich unsere Schule – eher inkrementell oder transformativ?</h2>
+        <p class="lede">
+          Dieses Dashboard unterstützt die gemeinsame Reflexion schulischer Entwicklungsdynamiken im ESG-Kontext. Es macht sichtbar,
+          ob die Schule vor allem bestehende Strukturen optimiert oder ihre Gesamtgestalt, Identität, Verantwortungsstrukturen
+          und Lernkultur strategisch weiterentwickelt.
+        </p>
+        <div class="pill-row" aria-label="Hauptbereiche des Modells">
+          <span class="pill adapt">Anpassung · Optimierung im bestehenden System</span>
+          <span class="pill develop">Entwicklung · Veränderung von Struktur, Profil und Identität</span>
+        </div>
+      </article>
+
+      <aside class="card soft">
+        <div class="kpi total" style="padding-top: 0.5rem; border-top-width: 6px;">
+          <span class="label">Arbeitsweise</span>
+          <div class="mode-switch" role="radiogroup" aria-label="Auswahl zwischen Einzel- und Gruppenbewertung">
+            <div>
+              <input type="radio" name="mode" id="mode-single" value="single" checked />
+              <label for="mode-single">Einzelbewertung</label>
+            </div>
+            <div>
+              <input type="radio" name="mode" id="mode-group" value="group" />
+              <label for="mode-group">Gruppenbewertung</label>
+            </div>
+          </div>
+          <p class="sub">Im Gruppenmodus können pro Dimension kurze Beobachtungen, Begründungen und Entwicklungsimpulse für Steuergruppe, Schulleitung oder Tischgruppen festgehalten werden.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="intro-grid" aria-label="Modellbeschreibung">
+      <article class="card area-card adapt">
+        <span class="eyebrow">Hauptbereich 1</span>
+        <h2>Anpassung</h2>
+        <p class="lede">
+          Anpassung beschreibt Wandel innerhalb des bestehenden Systems: Abläufe werden verbessert, Elemente ersetzt
+          oder Ressourcen quantitativ ausgeweitet bzw. reduziert.
+        </p>
+        <ul>
+          <li><strong>Perfektionierung:</strong> einzelne Elemente werden gezielt optimiert.</li>
+          <li><strong>Wechsel / Austausch:</strong> ein Element wird durch ein anderes ersetzt.</li>
+          <li><strong>Wachsen / Schrumpfen:</strong> quantitative Veränderung einzelner Elemente.</li>
+        </ul>
+      </article>
+
+      <article class="card area-card develop">
+        <span class="eyebrow">Hauptbereich 2</span>
+        <h2>Entwicklung</h2>
+        <p class="lede">
+          Entwicklung meint tiefergehenden Wandel: Strukturen, Konfigurationen und das pädagogische Selbstverständnis
+          der Schule werden bewusst weiterentwickelt.
+        </p>
+        <ul>
+          <li><strong>Umgestaltung:</strong> neue Formen, Strukturen und Ressourcen werden geschaffen.</li>
+          <li><strong>Erneuerung / Innovation:</strong> äußere Impulse verändern die Gesamtkonfiguration.</li>
+          <li><strong>Selbsterneuerung:</strong> die schulische Identität und Lernkultur werden reflektiert verändert.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="card toolbar" aria-label="Werkzeuge und Hinweise">
+      <div>
+        <h2>Bearbeitung und Nutzung</h2>
+        <p class="small-text">Bewerten Sie jede Aussage auf einer vierstufigen Skala. Das Dashboard eignet sich für Schulleitungsklausuren, Sitzungen der Steuergruppe und Tischgruppen bei einem Pädagogischen Tag. Alle Werte werden lokal im Browser gespeichert und bei erneutem Öffnen wiederhergestellt.</p>
+      </div>
+      <p class="small-text"><strong>Skala:</strong> 1 = trifft kaum zu · 2 = trifft teilweise zu · 3 = trifft überwiegend zu · 4 = trifft vollständig zu · Empfehlung für moderierte Formate: zuerst individuell einschätzen, dann konsensual als Gruppe bewerten.</p>
+    </section>
+
+    <section class="summary-grid" aria-label="Ergebnisübersicht">
+      <article class="card kpi adapt">
+        <span class="label">Mittelwert Anpassung</span>
+        <div class="value" id="adaptAvg">0,0</div>
+        <p class="sub">Optimierung, Austausch und Ressourcensteuerung im bestehenden System</p>
+      </article>
+      <article class="card kpi develop">
+        <span class="label">Mittelwert Entwicklung</span>
+        <div class="value" id="developAvg">0,0</div>
+        <p class="sub">Neugestaltung von Strukturen, Innovation und Weiterentwicklung des Schulprofils</p>
+      </article>
+      <article class="card kpi total">
+        <span class="label">Gesamtprofil</span>
+        <div class="value" id="overallAvg">0,0</div>
+        <p class="sub">Gesamtbild der aktuellen Schulentwicklung</p>
+      </article>
+      <article class="card kpi status">
+        <span class="label">Tendenz</span>
+        <div class="value" id="tendencyLabel" style="font-size:1.35rem; line-height:1.15;">Noch keine Daten</div>
+        <p class="sub" id="completionLabel">Bitte bewerten Sie die Aussagen; besonders geeignet als Startpunkt für die Auswertung im Kollegium.</p>
+      </article>
+    </section>
+
+    <section class="viz-wrap">
+      <article class="card chart-panel">
+        <div>
+          <span class="eyebrow">Visualisierung</span>
+          <h2>Radarprofil der sechs Dimensionen</h2>
+        </div>
+        <div class="chart-box">
+          <canvas id="radarChart" width="640" height="640" aria-label="Radar-Diagramm der sechs Dimensionen" role="img"></canvas>
+        </div>
+      </article>
+
+      <article class="card chart-panel">
+        <div>
+          <span class="eyebrow">Visualisierung</span>
+          <h2>Dimensionen im direkten Vergleich</h2>
+        </div>
+        <div class="bar-list" id="barList" aria-live="polite"></div>
+      </article>
+    </section>
+
+    <section>
+      <div style="display:grid; gap:0.5rem; margin-bottom:1rem;">
+        <span class="eyebrow">Bewertungsbereich</span>
+        <h2>Sechs Dimensionen schulischer Entwicklung</h2>
+      </div>
+      <div class="dimension-grid" id="dimensionGrid"></div>
+    </section>
+
+    <section class="bottom-grid">
+      <article class="card interpretation" aria-live="polite">
+        <div>
+          <span class="eyebrow">Interpretation für Leitungsverantwortung</span>
+          <h2>Automatische Deutung des aktuellen Profils</h2>
+        </div>
+        <div class="status-chip" id="profileChip">Profil wird berechnet</div>
+        <p id="interpretationText">Sobald Bewertungen vorliegen, erscheint hier eine zusammenfassende Deutung des Entwicklungsprofils.</p>
+        <p id="strengthText" class="small-text"></p>
+        <p id="priorityText" class="small-text"></p>
+      </article>
+
+      <aside class="card reflection">
+        <div>
+          <span class="eyebrow">Reflexionsimpulse</span>
+          <h2>Leitfragen für Schulleitung, Steuergruppe und Kollegium der ESG</h2>
+        </div>
+        <ul>
+          <li>Auf welcher Ebene findet bei uns Schulentwicklung hauptsächlich statt – eher als Optimierung im Bestehenden oder als bewusste Weiterentwicklung unserer Schule?</li>
+          <li>Wo investieren wir an der ESG derzeit die meiste Energie: in Unterrichtsverbesserung, Organisationssteuerung, Profilentwicklung oder Kulturwandel?</li>
+          <li>Welche Dimensionen sind bereits tragfähig entwickelt, welche bleiben bisher unterbelichtet oder abhängig von Einzelpersonen?</li>
+          <li>Welche zwei Felder sollten Schulleitung und Steuergruppe in den nächsten zwei bis drei Jahren prioritär bearbeiten?</li>
+          <li>Welche Beteiligungsformate brauchen wir, damit aus Befunden konkrete, gemeinsam verantwortete Schulentwicklungsziele werden?</li>
+        </ul>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      Offline nutzbare HTML-Datei mit lokaler Speicherung im Browser. Geeignet für Einzelreflexion, Steuergruppenarbeit, Schulleitungsklausuren und moderierte Kollegiumsprozesse im ESG-Kontext.
+    </div>
+  </footer>
+
+  <script>
+    const DIMENSIONS = [
+      {
+        key: 'perfektionierung',
+        area: 'adapt',
+        title: 'Perfektionierung',
+        short: 'Optimierung einzelner Elemente',
+        description: 'Einzelne Prozesse, Routinen oder Qualitätsmerkmale werden gezielt verbessert, ohne die Grundstruktur der Schule zu verändern.',
+        statements: [
+          'Unterrichtsentwicklung wird systematisch ausgewertet und führt zu erkennbaren Verbesserungen im Unterricht.',
+          'Fortbildungen werden strategisch ausgewählt und in konkrete schulische Praxis an der ESG überführt.',
+          'Bewährte Verfahren werden im Kollegium sichtbar gemacht, geteilt und verbindlich weiterentwickelt.',
+          'Rückmeldungen aus Evaluation, Feedback oder Vergleichsarbeiten werden für Optimierungen genutzt.'
+        ]
+      },
+      {
+        key: 'wechsel',
+        area: 'adapt',
+        title: 'Wechsel / Austausch',
+        short: 'Ersetzen einzelner Elemente',
+        description: 'Einzelne Werkzeuge, Verfahren oder Konzepte werden ausgetauscht, um die Schule wirksamer zu organisieren.',
+        statements: [
+          'Neue digitale Werkzeuge, Plattformen oder Kommunikationswege werden geplant eingeführt und sinnvoll in schulische Arbeitsabläufe integriert.',
+          'Lehrwerke, Kommunikationsroutinen oder organisatorische Verfahren werden bei Bedarf konsequent ersetzt.',
+          'Veränderungen werden nicht nur beschlossen, sondern begleitet, überprüft und bei Bedarf nachjustiert.',
+          'Entscheidungen über Austauschprozesse werden transparent kommuniziert und gegenüber Kollegium, Eltern und Lernenden nachvollziehbar begründet.'
+        ]
+      },
+      {
+        key: 'wachsen',
+        area: 'adapt',
+        title: 'Wachsen / Schrumpfen',
+        short: 'Quantitative Veränderung von Elementen',
+        description: 'Ressourcen, Angebote oder organisatorische Größenordnungen werden an veränderte Bedarfe angepasst.',
+        statements: [
+          'Veränderungen bei Schülerzahlen, Förderbedarfen oder Ganztagsanforderungen werden frühzeitig in Personal- und Raumplanung übersetzt.',
+          'Zusätzliche Angebote, Förderstrukturen oder Profile entstehen aus erkennbaren Bedarfen der Schulgemeinschaft heraus.',
+          'Bei knapper werdenden Ressourcen trifft die Schule priorisierte und strategisch nachvollziehbare Entscheidungen.',
+          'Belastungen, Deputate und zeitliche Ressourcen werden regelmäßig mit Blick auf Umsetzbarkeit und Verantwortbarkeit überprüft.'
+        ]
+      },
+      {
+        key: 'umgestaltung',
+        area: 'develop',
+        title: 'Umgestaltung',
+        short: 'Neue Formen, Strukturen und Ressourcen',
+        description: 'Die Schule gestaltet Lernsettings, Zeitstrukturen, Teamarbeit oder Räume bewusst neu.',
+        statements: [
+          'Unsere Schule entwickelt aktiv neue Lernformate, die über punktuelle Einzelmaßnahmen hinausgehen.',
+          'Zeitstrukturen, Teammodelle oder Zuständigkeiten werden pädagogisch begründet neu organisiert.',
+          'Räume und Lernumgebungen werden so weiterentwickelt, dass sie neue Formen des Lernens und Zusammenarbeitens ermöglichen.',
+          'Veränderungsprozesse werden als gestaltbare Entwicklungsprojekte mit klaren Verantwortlichkeiten in Schulleitung und Steuergruppe geführt.'
+        ]
+      },
+      {
+        key: 'innovation',
+        area: 'develop',
+        title: 'Erneuerung / Innovation',
+        short: 'Impuls von außen verändert die Gesamtkonfiguration',
+        description: 'Externe Impulse wie Digitalisierung, Kooperationen oder Reformen werden als strategische Entwicklungsanlässe genutzt.',
+        statements: [
+          'Externe Impulse wie Digitalisierung, Ganztag, Inklusion oder Reformvorgaben werden aktiv in Schulentwicklung übersetzt.',
+          'Die ESG arbeitet lernwirksam mit außerschulischen Partnern, Netzwerken oder anderen Schulen zusammen.',
+          'Innovation wird nicht nur übernommen, sondern an das eigene Schulprofil angepasst und weiterentwickelt.',
+          'Die Schulleitung nutzt externe Entwicklungen, um strategische Entscheidungen transparent zu begründen und Prioritäten zu setzen.'
+        ]
+      },
+      {
+        key: 'selbsterneuerung',
+        area: 'develop',
+        title: 'Selbsterneuerung',
+        short: 'Veränderung von Identität und Selbstverständnis',
+        description: 'Die Schule reflektiert ihr pädagogisches Profil und entwickelt sich als lernende Organisation weiter.',
+        statements: [
+          'Unsere Schule überprüft regelmäßig ihr pädagogisches Selbstverständnis und leitet daraus Entwicklungsziele ab.',
+          'Schulentwicklung folgt einer gemeinsam getragenen Vision, die im Alltag orientierend wirkt.',
+          'Lehrkräfte, Schüler:innen, Eltern und weitere Beteiligte sind in bedeutsame Entwicklungsfragen aktiv einbezogen.',
+          'Die ESG versteht sich erkennbar als lernende Organisation, die aus Erfahrungen, Rückmeldungen und Konflikten systematisch lernt.'
+        ]
+      }
+    ];
+
+    const SCALE_LABELS = {
+      1: 'kaum',
+      2: 'teilweise',
+      3: 'überwiegend',
+      4: 'vollständig'
+    };
+
+    const state = {
+      mode: 'single',
+      ratings: {},
+      notes: {}
+    };
+
+    const storageKey = 'wandelmodell-dashboard-v1';
+
+    const dimensionGrid = document.getElementById('dimensionGrid');
+    const barList = document.getElementById('barList');
+    const radarCanvas = document.getElementById('radarChart');
+    const ctx = radarCanvas.getContext('2d');
+
+    const adaptAvgEl = document.getElementById('adaptAvg');
+    const developAvgEl = document.getElementById('developAvg');
+    const overallAvgEl = document.getElementById('overallAvg');
+    const tendencyLabelEl = document.getElementById('tendencyLabel');
+    const completionLabelEl = document.getElementById('completionLabel');
+    const interpretationTextEl = document.getElementById('interpretationText');
+    const strengthTextEl = document.getElementById('strengthText');
+    const priorityTextEl = document.getElementById('priorityText');
+    const profileChipEl = document.getElementById('profileChip');
+
+    function formatNumber(value) {
+      return Number.isFinite(value) ? value.toFixed(1).replace('.', ',') : '0,0';
+    }
+
+    function buildDashboard() {
+      dimensionGrid.innerHTML = DIMENSIONS.map((dimension, dIndex) => {
+        const statementHtml = dimension.statements.map((statement, sIndex) => {
+          const name = `${dimension.key}-${sIndex}`;
+          return `
+            <fieldset class="statement">
+              <legend>${statement}</legend>
+              <div class="rating-row" role="radiogroup" aria-label="Bewertung für Aussage ${sIndex + 1} in ${dimension.title}">
+                ${[1, 2, 3, 4].map(value => `
+                  <div class="rating-option">
+                    <input type="radio" name="${name}" id="${name}-${value}" value="${value}" data-dimension="${dimension.key}" data-index="${sIndex}" />
+                    <label for="${name}-${value}">
+                      <span>${value}</span>
+                      <span>${SCALE_LABELS[value]}</span>
+                    </label>
+                  </div>
+                `).join('')}
+              </div>
+            </fieldset>
+          `;
+        }).join('');
+
+        return `
+          <article class="card dimension-card ${dimension.area}">
+            <div class="dimension-head">
+              <div>
+                <span class="eyebrow">${dimension.area === 'adapt' ? 'Anpassung' : 'Entwicklung'}</span>
+                <h3>${dimension.title}</h3>
+                <p class="desc">${dimension.short}</p>
+              </div>
+              <div class="badge" id="badge-${dimension.key}" aria-label="Punktwert ${dimension.title}">0,0</div>
+            </div>
+            <p class="desc">${dimension.description}</p>
+            <div class="statement-list">${statementHtml}</div>
+            <div class="group-note" id="note-wrap-${dimension.key}">
+              <label for="note-${dimension.key}">Gruppennotiz / Beobachtung</label>
+              <textarea id="note-${dimension.key}" data-note="${dimension.key}" placeholder="Kurze Beobachtungen, Begründungen oder Entwicklungsimpulse festhalten..."></textarea>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      barList.innerHTML = DIMENSIONS.map(d => `
+        <div class="bar-item">
+          <div class="bar-meta">
+            <strong>${d.title}</strong>
+            <span id="bar-value-${d.key}">0,0 / 4,0</span>
+          </div>
+          <div class="bar-track" aria-hidden="true">
+            <div class="bar-fill" id="bar-fill-${d.key}"></div>
+          </div>
+        </div>
+      `).join('');
+
+      attachEvents();
+      restoreState();
+      updateModeUI();
+      updateAll();
+    }
+
+    function attachEvents() {
+      document.querySelectorAll('input[type="radio"][data-dimension]').forEach(input => {
+        input.addEventListener('change', event => {
+          const { dimension, index } = event.target.dataset;
+          if (!state.ratings[dimension]) state.ratings[dimension] = {};
+          state.ratings[dimension][index] = Number(event.target.value);
+          persistState();
+          updateAll();
+        });
+      });
+
+      document.querySelectorAll('textarea[data-note]').forEach(textarea => {
+        textarea.addEventListener('input', event => {
+          state.notes[event.target.dataset.note] = event.target.value;
+          persistState();
+        });
+      });
+
+      document.querySelectorAll('input[name="mode"]').forEach(input => {
+        input.addEventListener('change', event => {
+          state.mode = event.target.value;
+          updateModeUI();
+          persistState();
+        });
+      });
+
+      document.getElementById('resetBtn').addEventListener('click', resetAll);
+      document.getElementById('printBtn').addEventListener('click', () => window.print());
+      window.addEventListener('resize', drawRadar);
+    }
+
+    function resetAll() {
+      const confirmed = window.confirm('Möchten Sie wirklich alle gespeicherten Bewertungen und Notizen zurücksetzen?');
+      if (!confirmed) return;
+      state.mode = 'single';
+      state.ratings = {};
+      state.notes = {};
+      localStorage.removeItem(storageKey);
+      document.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.checked = input.id === 'mode-single';
+      });
+      document.querySelectorAll('textarea[data-note]').forEach(textarea => {
+        textarea.value = '';
+      });
+      updateModeUI();
+      updateAll();
+    }
+
+    function persistState() {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function restoreState() {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        state.mode = parsed.mode || 'single';
+        state.ratings = parsed.ratings || {};
+        state.notes = parsed.notes || {};
+      } catch (error) {
+        console.warn('Lokaler Speicher konnte nicht gelesen werden.', error);
+      }
+
+      document.getElementById(state.mode === 'group' ? 'mode-group' : 'mode-single').checked = true;
+
+      DIMENSIONS.forEach(dimension => {
+        const dimRatings = state.ratings[dimension.key] || {};
+        Object.entries(dimRatings).forEach(([index, value]) => {
+          const input = document.getElementById(`${dimension.key}-${index}-${value}`);
+          if (input) input.checked = true;
+        });
+        const noteField = document.getElementById(`note-${dimension.key}`);
+        if (noteField) noteField.value = state.notes[dimension.key] || '';
+      });
+    }
+
+    function updateModeUI() {
+      const groupMode = state.mode === 'group';
+      document.querySelectorAll('.group-note').forEach(el => {
+        el.classList.toggle('active', groupMode);
+      });
+    }
+
+    function getDimensionValues(key) {
+      const values = Object.values(state.ratings[key] || {}).map(Number).filter(Number.isFinite);
+      return values;
+    }
+
+    function getDimensionAverage(key) {
+      const values = getDimensionValues(key);
+      if (!values.length) return 0;
+      return values.reduce((sum, value) => sum + value, 0) / values.length;
+    }
+
+    function getCompletion() {
+      const total = DIMENSIONS.reduce((sum, d) => sum + d.statements.length, 0);
+      const filled = DIMENSIONS.reduce((sum, d) => sum + getDimensionValues(d.key).length, 0);
+      return { total, filled, percent: total ? Math.round((filled / total) * 100) : 0 };
+    }
+
+    function getAreaAverage(area) {
+      const dims = DIMENSIONS.filter(d => d.area === area).map(d => getDimensionAverage(d.key)).filter(v => v > 0);
+      if (!dims.length) return 0;
+      return dims.reduce((sum, value) => sum + value, 0) / dims.length;
+    }
+
+    function getOverallAverage() {
+      const values = DIMENSIONS.map(d => getDimensionAverage(d.key)).filter(v => v > 0);
+      if (!values.length) return 0;
+      return values.reduce((sum, value) => sum + value, 0) / values.length;
+    }
+
+    function determineTendency(adapt, develop, overall, completion) {
+      if (completion.filled === 0) {
+        return {
+          tendency: 'Noch keine Daten',
+          detail: 'Bitte bewerten Sie die Aussagen.',
+          chip: 'Profil wird berechnet',
+          interpretation: 'Sobald Bewertungen vorliegen, erscheint hier eine zusammenfassende Deutung des Entwicklungsprofils.',
+          strength: '',
+          priority: ''
+        };
+      }
+
+      const diff = develop - adapt;
+      const sorted = DIMENSIONS
+        .map(d => ({ title: d.title, avg: getDimensionAverage(d.key) }))
+        .sort((a, b) => b.avg - a.avg);
+
+      const top = sorted[0];
+      const low = sorted[sorted.length - 1];
+
+      let tendency = 'Ausgewogenes Profil';
+      let chip = 'Mischprofil';
+      let interpretation = 'Das Profil zeigt eine relativ ausgewogene Verbindung von Anpassung und Entwicklung. Die Schule arbeitet sowohl an Optimierung als auch an tiefergehenden Entwicklungsimpulsen. Für die ESG eröffnet das die Chance, operative Verbesserungen gezielt mit strategischer Schulentwicklung zu verbinden.';
+
+      if (diff <= -0.35) {
+        tendency = 'Überwiegend inkrementell';
+        chip = 'Fokus auf Anpassung';
+        interpretation = 'Das Profil deutet derzeit eher auf inkrementelle Schulentwicklung hin. Die Schule investiert mehr Energie in die Optimierung bestehender Prozesse als in tiefgreifende strukturelle oder kulturelle Veränderung. Für die ESG kann dies ein Hinweis sein, Entwicklungsressourcen bewusster auf Profil- und Kulturfragen zu richten.';
+      } else if (diff >= 0.35) {
+        tendency = 'Überwiegend transformativ';
+        chip = 'Fokus auf Entwicklung';
+        interpretation = 'Das Profil deutet auf eine stärker transformative Schulentwicklung hin. Die Schule arbeitet erkennbar an neuen Strukturen, Konfigurationen und an der Weiterentwicklung ihres pädagogischen Selbstverständnisses. Für die ESG spricht dies für eine anschlussfähige Entwicklungsdynamik, die gut moderiert und abgesichert werden sollte.';
+      }
+
+      if (overall >= 3.25) {
+        interpretation += ' Insgesamt zeigt sich ein hohes Reifeprofil mit breiter Verankerung schulischer Entwicklungsarbeit.';
+      } else if (overall < 2.2) {
+        interpretation += ' Zugleich zeigen die Werte, dass Entwicklungsprozesse noch wenig systematisch oder noch nicht ausreichend breit verankert erscheinen.';
+      }
+
+      const strength = top.avg > 0
+        ? `Stärkste Dimension ist derzeit „${top.title}“ mit einem Mittelwert von ${formatNumber(top.avg)}. Hier liegen erkennbare Ressourcen und bereits tragfähige Praxisansätze für Schulleitung, Steuergruppe und Kollegium.`
+        : '';
+
+      const priority = low.avg > 0
+        ? `Der niedrigste Wert liegt aktuell bei „${low.title}“ (${formatNumber(low.avg)}). Dieses Feld eignet sich als prioritärer Ausgangspunkt für die nächste Entwicklungsplanung und für konkrete Vereinbarungen in Steuergruppe oder Pädagogischem Tag.`
+        : '';
+
+      return {
+        tendency,
+        detail: `${completion.filled} von ${completion.total} Aussagen bewertet · ${completion.percent}% vollständig`,
+        chip,
+        interpretation,
+        strength,
+        priority
+      };
+    }
+
+    function updateSummary() {
+      const adapt = getAreaAverage('adapt');
+      const develop = getAreaAverage('develop');
+      const overall = getOverallAverage();
+      const completion = getCompletion();
+      const text = determineTendency(adapt, develop, overall, completion);
+
+      adaptAvgEl.textContent = formatNumber(adapt);
+      developAvgEl.textContent = formatNumber(develop);
+      overallAvgEl.textContent = formatNumber(overall);
+      tendencyLabelEl.textContent = text.tendency;
+      completionLabelEl.textContent = text.detail;
+      interpretationTextEl.textContent = text.interpretation;
+      strengthTextEl.textContent = text.strength;
+      priorityTextEl.textContent = text.priority;
+      profileChipEl.textContent = text.chip;
+
+      profileChipEl.style.background = text.chip === 'Fokus auf Entwicklung'
+        ? 'rgba(111, 84, 68, 0.12)'
+        : text.chip === 'Fokus auf Anpassung'
+          ? 'rgba(40, 74, 92, 0.12)'
+          : 'rgba(23, 114, 69, 0.12)';
+
+      profileChipEl.style.color = text.chip === 'Fokus auf Entwicklung'
+        ? 'var(--develop-strong)'
+        : text.chip === 'Fokus auf Anpassung'
+          ? 'var(--adapt-strong)'
+          : 'var(--success)';
+    }
+
+    function updateDimensionDisplays() {
+      DIMENSIONS.forEach(dimension => {
+        const avg = getDimensionAverage(dimension.key);
+        const badge = document.getElementById(`badge-${dimension.key}`);
+        const barValue = document.getElementById(`bar-value-${dimension.key}`);
+        const barFill = document.getElementById(`bar-fill-${dimension.key}`);
+        if (badge) badge.textContent = formatNumber(avg);
+        if (barValue) barValue.textContent = `${formatNumber(avg)} / 4,0`;
+        if (barFill) {
+          barFill.style.width = `${(avg / 4) * 100}%`;
+          barFill.style.background = dimension.area === 'adapt'
+            ? 'linear-gradient(90deg, #284a5c, #477286)'
+            : 'linear-gradient(90deg, #6f5444, #a37b62)';
+        }
+      });
+    }
+
+    function drawRadar() {
+      const rect = radarCanvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      const size = Math.max(320, Math.min(rect.width || 640, 640));
+      radarCanvas.width = size * ratio;
+      radarCanvas.height = size * ratio;
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ctx.clearRect(0, 0, size, size);
+
+      const cx = size / 2;
+      const cy = size / 2;
+      const radius = size * 0.3;
+      const levels = 4;
+      const values = DIMENSIONS.map(d => getDimensionAverage(d.key));
+
+      ctx.save();
+      ctx.translate(0.5, 0.5);
+      ctx.strokeStyle = '#d2dbe3';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = '#5b6773';
+      ctx.font = `${Math.max(11, size * 0.022)}px Inter, sans-serif`;
+
+      for (let level = 1; level <= levels; level++) {
+        const currentRadius = radius * (level / levels);
+        ctx.beginPath();
+        DIMENSIONS.forEach((_, i) => {
+          const angle = (-Math.PI / 2) + (i * Math.PI * 2 / DIMENSIONS.length);
+          const x = cx + Math.cos(angle) * currentRadius;
+          const y = cy + Math.sin(angle) * currentRadius;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      DIMENSIONS.forEach((dimension, i) => {
+        const angle = (-Math.PI / 2) + (i * Math.PI * 2 / DIMENSIONS.length);
+        const x = cx + Math.cos(angle) * radius;
+        const y = cy + Math.sin(angle) * radius;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        const labelX = cx + Math.cos(angle) * (radius + size * 0.08);
+        const labelY = cy + Math.sin(angle) * (radius + size * 0.08);
+        ctx.textAlign = labelX < cx - 10 ? 'right' : labelX > cx + 10 ? 'left' : 'center';
+        ctx.textBaseline = labelY < cy ? 'bottom' : 'top';
+        wrapText(ctx, dimension.title, labelX, labelY, size * 0.2, size * 0.028);
+      });
+
+      ctx.beginPath();
+      values.forEach((value, i) => {
+        const scaled = radius * ((value || 0) / 4);
+        const angle = (-Math.PI / 2) + (i * Math.PI * 2 / DIMENSIONS.length);
+        const x = cx + Math.cos(angle) * scaled;
+        const y = cy + Math.sin(angle) * scaled;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(39, 76, 119, 0.2)';
+      ctx.strokeStyle = '#274c77';
+      ctx.lineWidth = 2.5;
+      ctx.fill();
+      ctx.stroke();
+
+      values.forEach((value, i) => {
+        const scaled = radius * ((value || 0) / 4);
+        const angle = (-Math.PI / 2) + (i * Math.PI * 2 / DIMENSIONS.length);
+        const x = cx + Math.cos(angle) * scaled;
+        const y = cy + Math.sin(angle) * scaled;
+        ctx.beginPath();
+        ctx.arc(x, y, Math.max(4, size * 0.008), 0, Math.PI * 2);
+        ctx.fillStyle = DIMENSIONS[i].area === 'adapt' ? '#284a5c' : '#6f5444';
+        ctx.fill();
+      });
+
+      ctx.restore();
+    }
+
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      const lines = [];
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = `${line}${words[n]} `;
+        const metrics = context.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          lines.push(line.trim());
+          line = `${words[n]} `;
+        } else {
+          line = testLine;
+        }
+      }
+      lines.push(line.trim());
+
+      lines.forEach((entry, index) => {
+        context.fillText(entry, x, y + (index * lineHeight));
+      });
+    }
+
+    function updateAll() {
+      updateDimensionDisplays();
+      updateSummary();
+      drawRadar();
+    }
+
+    buildDashboard();
+  </script>
+</body>
+</html>
